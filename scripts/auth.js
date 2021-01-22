@@ -1,15 +1,17 @@
 // listen for auth status changes
 auth.onAuthStateChanged(user => {
-  //console.log(user);
+  console.log(user);
   if (user) {
     // get data
-    db.collection('guides')
-      .get()
-      .then(snapshot => {
+    db.collection('guides').onSnapshot(
+      snapshot => {
         setupGuides(snapshot.docs);
-      });
-
-    setupUI(user);
+        setupUI(user);
+      },
+      err => {
+        console.log(err.message);
+      }
+    );
   } else {
     setupGuides([]);
     setupUI();
@@ -33,7 +35,7 @@ createForm.addEventListener('submit', e => {
       createForm.reset();
     })
     .catch(err => {
-      console.log(err.massage);
+      console.log(err.message);
     });
 });
 

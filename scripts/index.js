@@ -1,9 +1,15 @@
 const guideList = document.querySelector('.guides');
 const loggedOutLinks = document.querySelectorAll('.logged-out');
 const loggedInLinks = document.querySelectorAll('.logged-in');
+const accountDetails = document.querySelector('.account-details');
 
 const setupUI = user => {
   if (user) {
+    // account info
+    const html = `
+        <div>Logged in as ${user.email}</div>
+    `;
+    accountDetails.innerHTML = html;
     // toggle UI elemnts
     loggedInLinks.forEach(item => {
       item.style.display = 'block';
@@ -13,6 +19,8 @@ const setupUI = user => {
       item.style.display = 'none';
     });
   } else {
+    // hide account info
+    accountDetails.innerHTML = '';
     // toggle UI elemnts
     loggedInLinks.forEach(item => {
       item.style.display = 'none';
@@ -30,7 +38,7 @@ const setupGuides = data => {
     let html = '';
     data.forEach(doc => {
       const guide = doc.data();
-      console.log(guide);
+      //console.log(guide);
       const li = `
           <li>
               <div class="collapsible-header grey lighten-4">${guide.title}</div>
