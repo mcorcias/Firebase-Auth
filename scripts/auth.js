@@ -14,11 +14,16 @@ adminForm.addEventListener('submit', e => {
 auth.onAuthStateChanged(user => {
   //console.log(user);
   if (user) {
+    //admin true or undefined
+    user.getIdTokenResult().then(idTokenResult => {
+      //console.log(idTokenResult.claims);
+      user.admin = idTokenResult.claims.admin;
+      setupUI(user);
+    });
     // get data
     db.collection('guides').onSnapshot(
       snapshot => {
         setupGuides(snapshot.docs);
-        setupUI(user);
       },
       err => {
         console.log(err.message);
@@ -93,11 +98,16 @@ loginForm.addEventListener('submit', e => {
   const email = loginForm['login-email'].value;
   const password = loginForm['login-password'].value;
 
-  auth.signInWithEmailAndPassword(email, password).then(cred => {
-    //console.log(cred.user);
-    // close the login modal and reset the form
-    const modal = document.querySelector('#modal-login');
-    M.Modal.getInstance(modal).close();
-    loginForm.reset();
-  });
+  auth
+    .signInWithEmailAndPassword(email, password)
+    .then(cred => {
+      //console.log(cred.user);
+      // close the login modal and reset the form
+      const modal = document.querySelector('#modal-login');
+      M.Modal.getInstance(modal).close();
+      loginForm.reset();
+    })
+    .catch(err => {
+      console.log(err.message);
+    });
 });
