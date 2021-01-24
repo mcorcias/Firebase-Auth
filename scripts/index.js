@@ -3,9 +3,13 @@ const guideList = document.querySelector('.guides');
 const loggedOutLinks = document.querySelectorAll('.logged-out');
 const loggedInLinks = document.querySelectorAll('.logged-in');
 const accountDetails = document.querySelector('.account-details');
+const adminItems = document.querySelectorAll('.admin');
 
 const setupUI = user => {
   if (user) {
+    if (user.admin) {
+      adminItems.forEach(item => (item.style.display = 'block'));
+    }
     // account info
     db.collection('users')
       .doc(user.uid)
@@ -25,13 +29,14 @@ const setupUI = user => {
     // clear account info
     accountDetails.innerHTML = '';
     // toggle user elements
+    adminItems.forEach(item => (item.style.display = 'none'));
     loggedInLinks.forEach(item => (item.style.display = 'none'));
     loggedOutLinks.forEach(item => (item.style.display = 'block'));
   }
 };
 
 // setup guides
-const setupGuides = data => {
+const setupGuides = (data, flag) => {
   if (data.length) {
     let html = '';
     data.forEach(doc => {
@@ -46,7 +51,9 @@ const setupGuides = data => {
     });
     guideList.innerHTML = html;
   } else {
-    guideList.innerHTML = '<h5 class="center-align">Login to view guides</h5>';
+    guideList.innerHTML = flag
+      ? '<h5 class="center-align">No guides in the list</h5>'
+      : '<h5 class="center-align">Login to view guides</h5>';
   }
 };
 

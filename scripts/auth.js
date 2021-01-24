@@ -19,15 +19,17 @@ auth.onAuthStateChanged(user => {
       setupUI(user);
     });
 
-    db.collection('guides').onSnapshot(
-      snapshot => {
-        setupGuides(snapshot.docs);
-      },
-      err => console.log(err.message)
-    );
+    db.collection('guides')
+      .where('userId', '==', `${user.uid}`)
+      .onSnapshot(
+        snapshot => {
+          setupGuides(snapshot.docs, true);
+        },
+        err => console.log(err.message)
+      );
   } else {
     setupUI();
-    setupGuides([]);
+    setupGuides([], false);
   }
 });
 
@@ -39,6 +41,7 @@ createForm.addEventListener('submit', e => {
     .add({
       title: createForm.title.value,
       content: createForm.content.value,
+      userId: auth.currentUser.uid,
     })
     .then(() => {
       // close the create modal & reset form
@@ -73,6 +76,10 @@ signupForm.addEventListener('submit', e => {
       const modal = document.querySelector('#modal-signup');
       M.Modal.getInstance(modal).close();
       signupForm.reset();
+      signupForm.querySelector('.error').innerHTML = '';
+    })
+    .catch(err => {
+      signupForm.querySelector('.error').innerHTML = err.message;
     });
 });
 
@@ -93,10 +100,16 @@ loginForm.addEventListener('submit', e => {
   const password = loginForm['login-password'].value;
 
   // log the user in
-  auth.signInWithEmailAndPassword(email, password).then(cred => {
-    // close the signup modal & reset form
-    const modal = document.querySelector('#modal-login');
-    M.Modal.getInstance(modal).close();
-    loginForm.reset();
-  });
+  auth
+    .signInWithEmailAndPassword(email, password)
+    .then(cred => {
+      // close the signup modal & reset form
+      const modal = document.querySelector('#modal-login');
+      M.Modal.getInstance(modal).close();
+      loginForm.reset();
+      loginForm.querySelector('.error').innerHTML = '';
+    })
+    .catch(err => {
+      loginForm.querySelector('.error').innerHTML = err.message;
+    });
 });
